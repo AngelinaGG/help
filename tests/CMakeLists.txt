@@ -1,24 +1,29 @@
 cmake_minimum_required(VERSION 3.14)
-set(CXX_STANDARD 17)
-project(my-project)
 
-include_directories(
-        ${PROJECT_SOURCE_DIR}/src
-        ${PROJECT_SOURCE_DIR}/include
+#include(GoogleTest)
+
+# GoogleTest requires at least C++17
+set(CMAKE_CXX_STANDARD 17)
+
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
 )
-#add_subdirectory(libraries/googletest)
-file(GLOB all_SRCS
-        "${PROJECT_SOURCE_DIR}/include/*.h"
-        "${PROJECT_SOURCE_DIR}/src/*.cpp"
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
+add_executable(
+  hello_test2
+  tests.cpp
+)
+target_link_libraries(
+  hello_test2
+  GTest::gtest_main
 )
 
-option(MATCH_TESTS "build tests (or no)" ON)
-
-if (MATCH_TESTS)
-        add_library(example_google_tests ${all_SRCS})
-        enable_testing()
-        add_subdirectory(tests)
-endif()
-
-
-add_executable(app ${all_SRCS})
+include(GoogleTest)
+gtest_discover_tests(hello_test2)
